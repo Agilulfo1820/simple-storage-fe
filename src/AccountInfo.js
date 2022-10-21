@@ -1,23 +1,17 @@
 import {useState, useEffect} from 'react'
 
-function AccountInfo({account, provider}) {
-    const [networkName, setNetworkName] = useState(null)
+function AccountInfo({account, chain, provider}) {
+    const abbreviateAddress = (account) => {
+        if (!account)
+            return ''
 
-    useEffect(()=> {
-        getConnectedChain()
-    }, [])
-
-    const getConnectedChain = async () => {
-        if (provider) {
-            let chain = await provider.getNetwork()
-            setNetworkName(chain.name)
-        }
+        return account.slice(0, 6) + '...' + account.slice(account.length - 4, account.length)
     }
 
     return (
         <div>
-            <p>Connected to {account}</p>
-            <p>Chain: {networkName}</p>
+            <p>Connected to {abbreviateAddress(account)}</p>
+            {chain.id === 5 || chain.id === '0x5' ? <p>Chain: {chain.name}</p> : <p>Wrong network: please connect to Goerli</p>}
         </div>
     )
 }
