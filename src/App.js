@@ -6,8 +6,9 @@ import AccountInfo from './AccountInfo';
 function App() {
   const [isConnected, setIsConnected] = useState(false)
   const [account, setAccount] = useState(null)
-  const [provider, setProvider] = useState(null)
+  const [provider, setProvider] = useState(new ethers.providers.JsonRpcProvider('https://goerli.infura.io/v3/3117e0728b2740d5b5de2782abe77488'))
   const [chain, setChain] = useState({ id: null, name: null })
+  const [balance, setBalance] = useState(0)
 
   useEffect(()=> {
     if(window.ethereum) {
@@ -22,12 +23,13 @@ function App() {
     const address = await signer.getAddress()
 
     let chain = await tmpProvider.getNetwork()
-    console.log('chain', chain)
+    
     setIsConnected(true)
     setAccount(address)
     setProvider(tmpProvider)
     setChain({ id: chain.chainId, name: chain.name })
 
+    updateBalance(tmpProvider, address)
   }
 
   const connectMetamask = () => {
@@ -36,7 +38,6 @@ function App() {
     if (window.ethereum) {
       console.log('Metamask found!')
 
-      let tmpProvider
       window.ethereum.enable().then(async (accounts) => {
         console.log('waiting to initialize provider')
 
@@ -48,6 +49,7 @@ function App() {
             disconnectWallet()
           } else {
             setAccount(accounts[0])
+            updateBalance(provider, accounts[0])
           }
         })
 
@@ -61,6 +63,13 @@ function App() {
       window.alert('Please install metamask')
     }
   }
+
+  const updateBalance = async (provider, account) => {
+    console.log('Updating balance ', provider, account)
+    let balance = (await provider.getBalance(account)).toString()
+  
+    setBalance(ethers.utils.formatEther(balance))
+}
 
   const disconnectWallet = () => {
     setIsConnected(false)
@@ -77,7 +86,7 @@ function App() {
 
         {isConnected ?
           <div>
-            <AccountInfo account={account} provider={provider} chain={chain}></AccountInfo>
+            <AccountInfo account={account} provider={provider} chain={chain} balance={balance}></AccountInfo>
             <button onClick={disconnectWallet}>Disconnect Wallet</button>
           </div>
           : ''}

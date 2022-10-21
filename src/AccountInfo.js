@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import detectEthereumProvider from '@metamask/detect-provider'
+import {ethers} from 'ethers'
 
-function AccountInfo({ account, chain, provider }) {
+function AccountInfo({ account, chain, provider, balance}) {
     const abbreviateAddress = (account) => {
         if (!account)
             return ''
@@ -14,8 +15,8 @@ function AccountInfo({ account, chain, provider }) {
 
         provider.request({
             method: 'wallet_switchEthereumChain',
-            params: [{chainId: '0x5'}]
-        }).then((res)=> {
+            params: [{ chainId: '0x5' }]
+        }).then((res) => {
             console.log(res)
         })
     }
@@ -26,8 +27,9 @@ function AccountInfo({ account, chain, provider }) {
             {chain.id === 5 || chain.id === '0x5' ? <p>Chain: {chain.name}</p> :
                 <div>
                     <h5>Wrong network: please connect to Goerli!</h5>
-                    <h6>Click <a style={{color: 'red', textDecoration: 'underline', cursor: 'pointer'}} onClick={addGoerliToMetamask}>here</a> to add Goerli to your Metamask.</h6>
+                    <h6>Click <a style={{ color: 'red', textDecoration: 'underline', cursor: 'pointer' }} onClick={addGoerliToMetamask}>here</a> to add Goerli to your Metamask.</h6>
                 </div>}
+            <p>Balance: {balance} goeETH</p>
         </div>
     )
 }
